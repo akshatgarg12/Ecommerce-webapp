@@ -4,5 +4,5 @@ import { NextApiRequest, NextApiResponse } from "next"
 
 export default (req:NextApiRequest, res:NextApiResponse) => {
   res.statusCode = 200
-  res.json({ name: 'John Doe' })
+  res.json({ id : 4, name: 'John Doe', email:'John doe @ email.com' })
 }

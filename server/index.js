@@ -4,6 +4,8 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { graphqlHTTP } = require('express-graphql')
 const PORT = process.env.PORT || 5000
+
+// postgres connection
 const client = require('./config/postgres')
 
 require('dotenv').config()
@@ -22,8 +24,10 @@ app.use('/api/graphql',graphqlHTTP({
   graphiql: true,
 }),)
 
-app.get('/',(req,res)=>{
-  res.send("hello world");
+app.get('/',async (req,res)=>{
+  const data = await client.query('SELECT * FROM person');
+  res.status(200);
+  res.json(data.rows);
 })
 
 
