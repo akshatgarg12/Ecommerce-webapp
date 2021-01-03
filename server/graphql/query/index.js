@@ -5,9 +5,8 @@ const {
   GraphQLList,
   GraphQLInt,
 } = require('graphql')
-
 const {Products, Sellers} = require('../data')
-const {ProductType, SellerType} = require('../types');
+const {ProductType, SellerType} = require('../types')
 
 const RootQuery = new GraphQLObjectType({
   name:'RootQuery',
