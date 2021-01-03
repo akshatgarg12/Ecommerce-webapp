@@ -4,6 +4,8 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { graphqlHTTP } = require('express-graphql')
 const PORT = process.env.PORT || 5000
+const client = require('./config/postgres')
+
 require('dotenv').config()
 const MyGraphQLSchema = require('./graphql')
 // middlewares
@@ -23,5 +25,6 @@ app.use('/api/graphql',graphqlHTTP({
 app.get('/',(req,res)=>{
   res.send("hello world");
 })
+
 
 app.listen(PORT,()=> console.log(`server listening at ${PORT}`))
