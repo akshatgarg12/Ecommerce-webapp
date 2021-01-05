@@ -25,7 +25,7 @@ app.use('/api/graphql',graphqlHTTP({
 }),)
 
 app.get('/',async (req,res)=>{
-  const data = await client.query('SELECT * FROM person');
+  const data = await client.query('SELECT * FROM users');
   res.status(200);
   res.json(data.rows);
 })

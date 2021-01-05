@@ -6,25 +6,25 @@ const {
   GraphQLNonNull,
   GraphQLID,
   GraphQLInt,
-  parse
 } = require('graphql')
 
 const {Sellers, Products, Colleges} = require('../data');
-
+const client = require('../../config/postgres');
 // product type
 const ProductType = new GraphQLObjectType({
   name:'Product',
   fields:()=>({
     id:{type: new GraphQLNonNull(GraphQLID)},
-    sellerId:{type: new GraphQLNonNull(GraphQLID)},
+    sellerid:{type: new GraphQLNonNull(GraphQLID)},
     title:{type:new GraphQLNonNull(GraphQLString)},
     img:{type:new GraphQLNonNull(GraphQLString)},
     price:{type:new GraphQLNonNull(GraphQLInt)},
     avialable:{type: new GraphQLNonNull(GraphQLBoolean)},
     seller:{
       type:SellerType,
-      resolve(parent, _){
-        return Sellers.filter((seller) => seller.id === parent.sellerId)[0];
+      async resolve(parent, _){
+        const data = await client.query('SELECT * FROM users WHERE id = $1', [parent.sellerId])
+        return data.rows[0];
       }
     }
   })
@@ -36,27 +36,30 @@ const SellerType = new GraphQLObjectType({
   fields:()=>({
     id:{type: new GraphQLNonNull(GraphQLID)},
     name:{type:GraphQLString},
-    displayImg:{type:GraphQLString},
+    displayimg:{type:GraphQLString},
     email:{type:GraphQLString},
     location:{type:GraphQLString},
     age:{type:GraphQLInt},
     college:{
       type:CollegeType,
-      resolve(parent, _){
-        return Colleges.filter(college => college.id === parseInt(parent.collegeId))[0];
+      async resolve(parent, _){
+        const data = await client.query('SELECT * FROM college WHERE id = $1', [parent.collegeid])
+        // console.log()
+        return data.rows[0];
       }
     },
     year:{type:GraphQLInt},
     contact:{
       type:ContactType,
       resolve(parent, _){
-        return Sellers.filter(seller => seller.id === parseInt(parent.id))[0].contact;
+        return parent.contact;
       }
     },
     products:{
       type:GraphQLList(ProductType),
-      resolve(parent, _){
-        return Products.filter(product => product.sellerId === parseInt(parent.id));
+      async resolve(parent, _){
+        const data = await client.query('SELECT * FROM product WHERE sellerId = $1', [parent.id]);
+        return data.rows;
       }
     }
   })
@@ -66,7 +69,7 @@ const SellerType = new GraphQLObjectType({
 const ContactType = new GraphQLObjectType({
   name:'Contact',
   fields:()=>({
-    phoneNumber:{type:GraphQLString},
+    phonenumber:{type:GraphQLString},
     address:{type:GraphQLString},
     facebook:{type:GraphQLString},
     instagram:{type:GraphQLString}
@@ -80,11 +83,11 @@ const CollegeType = new GraphQLObjectType({
     id:{type:GraphQLID},
     name:{type:GraphQLString},
     location:{type:GraphQLString},
-    studentsNum:{
+    studentnumber:{
       type:GraphQLInt,
-      resolve(parent,_){
-        return Sellers.filter(seller => seller.collegeId === parseInt(parent.id)).length;
-      }
+      // resolve(parent,_){
+      //   return Sellers.filter(seller => seller.collegeId === parseInt(parent.id)).length;
+      // }
     },
   })
 })

@@ -7,6 +7,7 @@ const {
 } = require('graphql')
 const {Products, Sellers} = require('../data')
 const {ProductType, SellerType} = require('../types')
+const client = require('../../config/postgres')
 
 const RootQuery = new GraphQLObjectType({
   name:'RootQuery',
@@ -17,9 +18,10 @@ const RootQuery = new GraphQLObjectType({
       args:{
         id:{type:new GraphQLNonNull(GraphQLID)},
       },
-      resolve(_,args){
+      async resolve(_,args){
         const {id} = args;
-        return Products.filter((product) => product.id === parseInt(id))[0]
+        const data = await client.query('SELECT * FROM product WHERE id = $1', [id])
+        return data.rows[0];
       }
     },
     seller:{
@@ -28,16 +30,19 @@ const RootQuery = new GraphQLObjectType({
       args:{
         id:{type:new GraphQLNonNull(GraphQLID)}
       },
-      resolve(_, args){
+      async resolve(_, args){
         const {id} = args;
-        return Sellers.filter(seller=> seller.id === parseInt(id))[0];
+        const data = await client.query('SELECT * FROM users WHERE id = $1', [id])
+        return data.rows[0];
       }
     },
     sellers:{
       name:'Sellers',
       type:GraphQLList(SellerType),
-      resolve(_, args){
-        return Sellers;
+      async resolve(_, args){
+        const data = await client.query('SELECT * FROM users')
+        console.log(data.rows);
+        return data.rows;
       }
     },
     products:{
