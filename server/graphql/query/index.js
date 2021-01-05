@@ -33,6 +33,13 @@ const RootQuery = new GraphQLObjectType({
         return Sellers.filter(seller=> seller.id === parseInt(id))[0];
       }
     },
+    sellers:{
+      name:'Sellers',
+      type:GraphQLList(SellerType),
+      resolve(_, args){
+        return Sellers;
+      }
+    },
     products:{
       name:'Products',
       type:GraphQLList(ProductType),

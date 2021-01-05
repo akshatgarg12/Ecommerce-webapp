@@ -1,7 +1,24 @@
-import { useQuery, gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import ProtectedRoute from '../../src/components/protectedRoute';
 
+const USER_QUERY = (id:string) => gql`
+  {
+    seller(id:${id}){
+      id
+      name
+      products{
+        id
+        price
+        img
+      }
+      college{
+        name
+      }
+    }
+    
+  }
+`;
 export const getStaticProps : GetStaticProps = async (context) => {
   return {
     props:{
@@ -17,36 +34,28 @@ export const getStaticPaths:GetStaticPaths = async() => {
   }
 }
 
-const SELLER_INFO = (id:string) => gql`
-  {
-    seller(id:${id}){
-      id
-      name
-      email
-      products{
-        id
-        price
-        img
-      }
-      college{
-        name
-      }
-    }
-    
-  }
-`;
+// export interface Product{
+//   id:number|string,
+//   price:number|string,
+//   img:string,
+//   __typename?:string,
+// }
+// export interface UserProfilePageProps{
+//   id:number|string,
+//   __typename?:string,
+//   name:string,
+//   products:Product[],
+//   college:{
+//     __typename?:string,
+//     name:string
+//   }
+// }
 
 const userProfilePage:React.FC<{id:string}> = ({id}) => {
-  const { loading, error, data } = useQuery(SELLER_INFO(id));
-  if (loading) return <p>Loading...</p>;
-  // removed cause on every fallback it was invoked/
-  // if (error){
-  //   console.log(error);
-  //   return <p>Error : {error.message}</p>;
-  // } 
+  const {loading, error, data} = useQuery(USER_QUERY(id));
   return (
     <ProtectedRoute>
-     <h1>{data?.seller?.name}</h1>
+       <h1>hlo {data && data.seller.name}</h1>
     </ProtectedRoute>
   )
 }
