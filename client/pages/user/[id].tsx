@@ -1,8 +1,25 @@
 import { useQuery, gql } from '@apollo/client';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import ProtectedRoute from '../../src/components/protectedRoute';
 
-const SELLER_INFO = gql`
+export const getStaticProps : GetStaticProps = async (context) => {
+  return {
+    props:{
+      id:context.params.id
+    },
+  }
+}
+
+export const getStaticPaths:GetStaticPaths = async() => {
+  return {
+    paths:[],
+    fallback:true
+  }
+}
+
+const SELLER_INFO = (id:string) => gql`
   {
-    seller(id:3){
+    seller(id:${id}){
       id
       name
       email
@@ -19,11 +36,19 @@ const SELLER_INFO = gql`
   }
 `;
 
-const userProfilePage:React.FC<any> = () => {
-  const { loading, error, data } = useQuery(SELLER_INFO);
+const userProfilePage:React.FC<{id:string}> = ({id}) => {
+  const { loading, error, data } = useQuery(SELLER_INFO(id));
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error : {error.message}</p>;
-  return <h1>{data.seller.name}</h1>
+  // removed cause on every fallback it was invoked/
+  // if (error){
+  //   console.log(error);
+  //   return <p>Error : {error.message}</p>;
+  // } 
+  return (
+    <ProtectedRoute>
+     <h1>{data?.seller?.name}</h1>
+    </ProtectedRoute>
+  )
 }
 
 

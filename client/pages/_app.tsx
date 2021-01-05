@@ -3,15 +3,17 @@ import 'semantic-ui-css/semantic.min.css'
 import Navbar from '../src/components/templates/navbar'
 import client from '../src/config/graphql';
 import { ApolloProvider } from '@apollo/client';
+import UserContextProvider from '../src/context/auth';
 
 function MyApp({ Component, pageProps }) {
-  // console.log(client);
   return ( 
   <ApolloProvider client={client}>
-    <div>
-      <Navbar />
-      <Component {...pageProps} />
-    </div>
+    <UserContextProvider>
+      <div>
+        <Navbar />
+        <Component {...pageProps} />
+      </div>
+    </UserContextProvider>
   </ApolloProvider>
   )
 }
