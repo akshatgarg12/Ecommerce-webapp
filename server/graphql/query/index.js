@@ -4,8 +4,9 @@ const {
   GraphQLID,
   GraphQLList,
   GraphQLInt,
+  GraphQLString,
 } = require('graphql')
-const {Products, Sellers} = require('../data')
+const {Products} = require('../data')
 const {ProductType, SellerType} = require('../types')
 const client = require('../../config/postgres')
 
@@ -39,9 +40,14 @@ const RootQuery = new GraphQLObjectType({
     sellers:{
       name:'Sellers',
       type:GraphQLList(SellerType),
+      args:{collegeid:{type:GraphQLString}},
       async resolve(_, args){
+        const {collegeid} = args;
+        if(collegeid){
+          const data = await client.query('SELECT * FROM users WHERE collegeid = $1',[collegeid]);
+          return data.rows;
+        }
         const data = await client.query('SELECT * FROM users')
-        console.log(data.rows);
         return data.rows;
       }
     },
