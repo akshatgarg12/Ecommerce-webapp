@@ -6,7 +6,7 @@ const cookieAge = 3 * 60 * 60 * 1000;
 const validator = require('validator');
 const {v4:uuid} = require('uuid');
 const getJWT = (id) => {
-  const token = jwt.sign({id},"some-secret",{expiresIn:cookieAge/1000});
+  const token = jwt.sign({id},process.env.JWT_SECRET,{expiresIn:cookieAge/1000});
   return token;
 }
 
@@ -16,14 +16,15 @@ router.post('/login', async (req,res) => {
     return res.status(404).json({error:"please fill all the fields"});
   } 
   // to check email and get users password.
-  const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+  const query = 'SELECT * FROM users WHERE email = $1'
+  const params = [email]
+  const user = await client.query(query,params);
   if(user.rows.length){
     const {id} = user.rows[0];
     const storedPassword = user.rows[0].password;
-    
     bcrypt.compare(password, storedPassword, (err,match)=>{
       if(err){
-      console.log(err);
+       console.log(err);
        return res.status(404).json({error:"You are unauthorized"});
       }
       if(match){
