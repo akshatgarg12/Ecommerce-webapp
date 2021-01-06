@@ -10,6 +10,7 @@ const client = require('./config/postgres')
 const apiRoutes = require('./routes');
 const authMiddleware = require('./middleware/auth');
 require('dotenv').config()
+
 const MyGraphQLSchema = require('./graphql')
 // middlewares
 app.use(helmet({
@@ -28,7 +29,7 @@ app.use('/api', apiRoutes);
 
 app.get('/',authMiddleware,async (req,res)=>{
   const data = await client.query('SELECT * FROM users');
-  console.log(req.user);
+  // console.log(req.user);
   res.status(200);
   res.json(data.rows);
 })

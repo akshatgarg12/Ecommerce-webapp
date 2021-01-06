@@ -43,9 +43,9 @@ router.post('/login', async (req,res) => {
 });
 
 router.post('/register', async(req,res)=>{
-  const {name, email, password, age, location, collegeid, year} = req.body;
+  const {name, email, password, age, location, collegeid, year, contact} = req.body;
 
-  if(!name || !email || !password || !age || !location || !collegeid || !year){
+  if(!name || !email || !password || !age || !location || !collegeid || !year || !contact){
    return res.status(404).json({error:"please fill all the fields"});
   } 
   // check if the email is valid,hash the password and store the user.
@@ -53,7 +53,9 @@ router.post('/register', async(req,res)=>{
     const hashedPassword = await bcrypt.hash(password,10);
     const id = uuid();
     try{
-      const user = await client.query('INSERT INTO users(id, name, email, password, age, location, collegeid, year, contact) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)', [id,name,email,hashedPassword,age,location,collegeid,year, {phonenumber:"8107784040"}]);
+      const query = 'INSERT INTO users(id, name, email, password, age, location, collegeid, year, contact) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)';
+      const params = [id,name,email,hashedPassword,age,location,collegeid,year,contact]
+      const user = await client.query(query,params);
       res.status(200).json({success:"user registered successfully"});
     }catch(e){
       console.log("error at registering user: ", e.message);
